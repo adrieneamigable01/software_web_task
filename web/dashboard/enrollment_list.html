@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <title>Enrollee</title>
+        <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet" />
+        <link href="../css/styles.css" rel="stylesheet" />
+        <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+    </head>
+    <body class="sb-nav-fixed">
+        <div w3-include-html="nav.html"></div>
+        <div id="layoutSidenav">
+            <div id="layoutSidenav_nav">
+                <div w3-include-html="sidenav.html"></div>
+            </div>
+            <div id="layoutSidenav_content">
+                <main>
+                    <div class="container-fluid px-4">
+                        <h1 class="mt-4">Enrolee Tables</h1>
+                        <ol class="breadcrumb mb-4">
+                            <li class="breadcrumb-item"><a href="index.html">Dashboard</a></li>
+                            <li class="breadcrumb-item active">Enrolment</li>
+                        </ol>
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <i class="fas fa-table me-1"></i>
+                                Enrollment Table
+                            </div>
+                            <div class="card-body">
+                                <table class="table" id="table-enrolee">
+                                    <thead>
+                                        <tr>
+                                            <th>Name of Child</th>
+                                            <th>Birthday</th>
+                                            <th>LRN or Student ID</th>
+                                            <th>Parent Name</th>
+                                            <th>Parent Contact Number</th>
+                                            <th>Parent Email Address</th>
+                                            <th>Parent Relationship</th>
+                                        </tr>
+                                    </thead>
+                                    <tfoot>
+                                        <tr>
+                                            <th>Name of Child</th>
+                                            <th>Name of Child</th>
+                                            <th>LRN or Student ID</th>
+                                            <th>Parent Name</th>
+                                            <th>Parent Contact Number</th>
+                                            <th>Parent Email Address</th>
+                                            <th>Parent Relationship</th>
+                                        </tr>
+                                    </tfoot>
+                                    <tbody>
+                                        
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+                <div w3-include-html="footer.html"></div>
+            </div>
+        </div>
+        <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+        <script src="https://use.fontawesome.com/3f0c82a4e2.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+        <script src="../js/constant.js"></script>
+        <script src="../js/scripts.js"></script>
+        <script src="../js/jquery-2.2.4.min.js"></script>
+        <script src="../js/jquery.validate.js"></script>
+        <script src="../js/additional-methods.js"></script>
+        <script src="../js/sweetalert2@7.26.11.js"></script>
+        <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js" crossorigin="anonymous"></script>
+        <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+        <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+        <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+        <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+        <script src="../js/checker.js"></script>
+        <script>
+            var enrollment_list = {
+                init:()=>{
+                    enrollment_list.ajaxz.get_list();
+                },
+                message:{
+                    showQuickMessage:(type = "success",message = "Done")=>{
+                        Swal.fire({
+                            position: 'top-end',
+                            type: type,
+                            title: message,
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(()=>{
+                            
+                        })
+                    },
+                    
+                },
+                ajaxz:{
+                    get_list:()=>{
+                        $.ajax({
+                            type:'get',
+                            url:get_enrollment_list,
+                            dataType:'json',
+                            beforeSend:function(){
+                                $("#table-enrolee tbody").html("");
+                            },
+                            success:function(response){
+                                if(!response.isError){
+                                    // <th>Name of Child</th>
+                                    // <th>Birthday</th>
+                                    // <th>LRN or Student ID</th>
+                                    // <th>Parent Name</th>
+                                    // <th>Parent Contact Number</th>
+                                    // <th>Parent Email Address</th>
+                                    // <th>Parent Relationship</th>
+                                    new Promise((res,rej)=>{
+                                        $.each(response.data,function(key,value){
+                                            let studentName = `${value.student_firstname} ${value.student_middlename} ${value.student_lastname}`;
+                                            let parentName = `${value.parent_firstname} ${value.parent_middlename} ${value.parent_lastname}`;
+                                            
+                                            $("#table-enrolee tbody").append(
+                                                $("<tr>").append(
+                                                    $("<td>").text(studentName),
+                                                    $("<td>").text(value.student_birthdate),
+                                                    $("<td>").text(value.student_id),
+                                                    $("<td>").text(parentName),
+                                                    $("<td>").text(value.parent_mobile),
+                                                    $("<td>").text(value.parent_email),
+                                                    $("<td>").text(value.relationship),
+                                                )
+                                            );
+
+                                            if(Object.keys(response.data).length - 1 == key){
+                                                res(true);
+                                            }
+                                        });
+                                    }).then(()=>{
+                                        $("#table-enrolee").DataTable({
+                                            dom: 'Bfrtip',
+                                            buttons: [
+                                                'copy', 'csv', 'excel', 'pdf', 'print'
+                                            ]
+                                        });
+                                    })
+                                    
+                                }
+                            }
+                        })
+                    }
+                }
+            }
+
+            enrollment_list.init();
+
+            $('#frm_login').validate({
+                errorElement: 'span',
+                errorClass: 'text-danger',
+                highlight: function (element, errorClass, validClass) {
+                $(element).closest('.form-group').addClass("has-warning");
+                $(element).closest('.form-group').find("input").addClass('is-invalid');
+                },
+                unhighlight: function (element, errorClass, validClass) {
+                $(element).closest('.form-group').removeClass("has-warning");
+                $(element).closest('.form-group').find("input").removeClass('is-invalid');
+                },
+                // 
+                rules: {
+                    username: {
+                        required: true,
+                    },
+                    password: {
+                        required: true,
+                    },
+                },
+                submitHandler:function(form)
+                {
+                    let payload = {
+                        'username': $(form).find(":input[name=username]").val(),
+                        'password': $(form).find(":input[name=password]").val(),
+                    }
+                    enrollment_list.ajaxz.enrollment_list(payload);
+                }
+            })
+
+        </script>
+    </body>
+</html>
